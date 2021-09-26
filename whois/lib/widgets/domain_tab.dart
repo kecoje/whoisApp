@@ -69,7 +69,7 @@ class _DomainTabState extends State<DomainTab> {
                       //API call
                       whois.setNotify(widget.domain.name, true);
                     };
-                    
+
                     await showDialog(
                         context: context,
                         builder: (_) => NotificationDialog(onAccept));
@@ -143,63 +143,62 @@ class _DomainTabState extends State<DomainTab> {
                 padding: EdgeInsets.zero,
               ),
             //FAVORITE
-            if (!widget.domain.isNewlyUnlocked)
-              IconButton(
-                onPressed: () {
-                  setState(() {
-                    final int exIndex =
-                        whois.favoriteDomains.indexOf(widget.domain);
-                    if (widget.domain.toggleFavorite()) {
-                      //pozicija zbog anmiacije
-                      int position =
-                          whois.favoriteDomains.indexOf(widget.domain);
-                      WhoisProvider.favoritesListKey.currentState
-                          ?.insertItem(position);
-                      showToast(
-                          widget.domain.name +
-                              Provider.of<LocalizationProvider>(context,
-                                      listen: false)
-                                  .jeDodatNaListuOmiljenih,
-                          greenish,
-                          widget.fToast);
-                    } else {
-                      WhoisProvider.favoritesListKey.currentState?.removeItem(
-                        exIndex,
-                        (context, animation) => slideIt(
-                            animation,
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                DomainTab(widget.domain, FToast()),
-                                Container(
-                                  height: 1,
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  color: lightText,
-                                )
-                              ],
-                            )),
-                      );
-                      showToast(
-                          widget.domain.name +
-                              Provider.of<LocalizationProvider>(context,
-                                      listen: false)
-                                  .jeUklonjenSaListeOmiljenih,
-                          Colors.orange,
-                          widget.fToast);
-                    }
-                    whois.notifyListeners();
-                    whois.save();
-                  });
-                },
-                icon: Icon(
-                    widget.domain.isFavorite
-                        ? Icons.favorite
-                        : Icons.favorite_border,
-                    size: 32),
-                visualDensity: VisualDensity.compact,
-                padding: EdgeInsets.zero,
-              )
+
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  final int exIndex =
+                      whois.favoriteDomains.indexOf(widget.domain);
+                  if (widget.domain.toggleFavorite()) {
+                    //pozicija zbog anmiacije
+                    int position = whois.favoriteDomains.indexOf(widget.domain);
+                    WhoisProvider.favoritesListKey.currentState
+                        ?.insertItem(position);
+                    showToast(
+                        widget.domain.name +
+                            Provider.of<LocalizationProvider>(context,
+                                    listen: false)
+                                .jeDodatNaListuOmiljenih,
+                        greenish,
+                        widget.fToast);
+                  } else {
+                    WhoisProvider.favoritesListKey.currentState?.removeItem(
+                      exIndex,
+                      (context, animation) => slideIt(
+                          animation,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DomainTab(widget.domain, FToast()),
+                              Container(
+                                height: 1,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                color: lightText,
+                              )
+                            ],
+                          )),
+                    );
+                    showToast(
+                        widget.domain.name +
+                            Provider.of<LocalizationProvider>(context,
+                                    listen: false)
+                                .jeUklonjenSaListeOmiljenih,
+                        Colors.orange,
+                        widget.fToast);
+                  }
+                  whois.notifyListeners();
+                  whois.save();
+                });
+              },
+              icon: Icon(
+                  widget.domain.isFavorite
+                      ? Icons.favorite
+                      : Icons.favorite_border,
+                  size: 32),
+              visualDensity: VisualDensity.compact,
+              padding: EdgeInsets.zero,
+            )
           ],
         ),
       );
