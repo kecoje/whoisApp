@@ -76,9 +76,16 @@ class LocalizationProvider extends ChangeNotifier {
   String get registar => _l ? "Registar" : "Регистар";
   String get registarUrl => _l ? "Registar URL" : "Регистар УРЛ";
   String get dnsAdrese => _l ? "DNS adrese" : "ДНС адресе";
+  String get mejlServer => _l ? "Mejl server" : "Мејл сервер";
   String get domenJeSlobodan => _l ? "Domen je slobodan" : "Домен је слободан";
 
   String get oslobodjen => _l ? "oslobođen" : "ослобођен";
+
+  String get ukljuciNotifikaciju => _l ? "Uključi notifikaciju" : "Укључи нотификацију";
+  String get obavestiMeIPutemMejla => _l ? "Obavesti me i putem email-a" : "Обавести ме и путем мејла";
+  String get unesiteEmail => _l ? "Unesite email" : "Унесите имејл";
+  String get ok => _l ? "OK" : "ОК";
+  String get cancel => _l ? "PONIŠTI" : "ПОНИШТИ";
 
   Map<String, dynamic> toJson() {
     return {

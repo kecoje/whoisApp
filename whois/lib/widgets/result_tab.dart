@@ -32,6 +32,7 @@ class _ResultTabState extends State<ResultTab> {
 
   @override
   Widget build(BuildContext context) {
+    final nepoznato = Provider.of<LocalizationProvider>(context).nepoznato;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -51,34 +52,36 @@ class _ResultTabState extends State<ResultTab> {
             child: Text(
               Provider.of<LocalizationProvider>(context).vlasnik +
                   ": " +
-                  (widget.data.owner ??
-                      Provider.of<LocalizationProvider>(context).nepoznato),
+                  (widget.data.owner ?? nepoznato),
               style: TextStyle(fontSize: 18),
             ),
           ),
-          if (widget.data.dateRegistered != null)
-            Container(
-              color: lightText,
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-              child: Text(
-                Provider.of<LocalizationProvider>(context).registrovano +
-                    ": " +
-                    DateFormat.yMd("sr-Latn")
-                        .format(widget.data.dateRegistered!),
-                style: TextStyle(fontSize: 18),
-              ),
+          Container(
+            color: lightText,
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: Text(
+              Provider.of<LocalizationProvider>(context).registrovano +
+                  ": " +
+                  (widget.data.dateRegistered != null
+                      ? DateFormat.yMd("sr-Latn")
+                          .format(widget.data.dateRegistered!)
+                      : nepoznato),
+              style: TextStyle(fontSize: 18),
             ),
-          if (widget.data.dateExpiring != null)
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-              child: Text(
-                Provider.of<LocalizationProvider>(context).istice +
-                    ": " +
-                    DateFormat.yMd("sr-Latn").format(widget.data.dateExpiring!),
-                style: TextStyle(fontSize: 18),
-              ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: Text(
+              Provider.of<LocalizationProvider>(context).istice +
+                  ": " +
+                  (widget.data.dateExpiring != null
+                      ? DateFormat.yMd("sr-Latn")
+                          .format(widget.data.dateExpiring!)
+                      : nepoznato),
+              style: TextStyle(fontSize: 18),
             ),
+          ),
           Container(
             color: lightText,
             width: double.infinity,
@@ -86,8 +89,7 @@ class _ResultTabState extends State<ResultTab> {
             child: Text(
               Provider.of<LocalizationProvider>(context).registar +
                   ": " +
-                  (widget.data.registrar ??
-                      Provider.of<LocalizationProvider>(context).nepoznato),
+                  (widget.data.registrar ?? nepoznato),
               style: TextStyle(fontSize: 18),
             ),
           ),
@@ -106,8 +108,7 @@ class _ResultTabState extends State<ResultTab> {
                           : null
                       : null,
                   child: Text(
-                    (widget.data.registrarUrl ??
-                        Provider.of<LocalizationProvider>(context).nepoznato),
+                    (widget.data.registrarUrl ?? nepoznato),
                     style: TextStyle(
                         fontSize: 18,
                         decoration: widget.data.registrarUrl != null
@@ -118,57 +119,79 @@ class _ResultTabState extends State<ResultTab> {
               ],
             ),
           ),
-          Container(
-            color: lightText,
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  Provider.of<LocalizationProvider>(context).dnsAdrese,
-                  style: TextStyle(fontSize: 18),
-                ),
-                const Spacer(),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _hidden = !_hidden;
-                    });
-                  },
-                  icon: Icon(
-                      _hidden
-                          ? Icons.arrow_drop_up_sharp
-                          : Icons.arrow_drop_down_sharp,
-                      size: 32),
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
-                )
-              ],
+          if (widget.data.dns != null)
+            Container(
+              color: lightText,
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    Provider.of<LocalizationProvider>(context).dnsAdrese,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _hidden = !_hidden;
+                      });
+                    },
+                    icon: Icon(
+                        _hidden
+                            ? Icons.arrow_drop_up_sharp
+                            : Icons.arrow_drop_down_sharp,
+                        size: 32),
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                  )
+                ],
+              ),
             ),
-          ),
           AnimatedSize(
             duration: Duration(milliseconds: 500),
-            child: _hidden
-                ? SizedBox(
+            child: _hidden && widget.data.dns != null
+                ? const SizedBox(
                     width: double.infinity,
                   )
                 : Column(
-                    children: widget.data.dnss
-                        .map(
-                          (dns) => Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 16),
-                            child: Text(
-                              dns.address,
-                              style: TextStyle(fontSize: 16),
-                            ),
+                    children: [
+                      ...widget.data.dns!.ipv4Adresses.map(
+                        (v4adr) => Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 16),
+                          child: Text(
+                            v4adr,
+                            style: TextStyle(fontSize: 16),
                           ),
-                        )
-                        .toList(),
+                        ),
+                      ),
+                      ...widget.data.dns!.ipv6Adresses.map(
+                        (v4adr) => Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 16),
+                          child: Text(
+                            v4adr,
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-          )
+          ),
+          if (widget.data.dns != null && false)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: Text(
+                Provider.of<LocalizationProvider>(context).mejlServer +
+                    ": " +
+                    (widget.data.dns!.mailServer ?? nepoznato),
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
         ] else
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),

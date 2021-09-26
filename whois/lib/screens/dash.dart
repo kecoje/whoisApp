@@ -297,7 +297,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String input = _searchController.text.toLowerCase();
     //Podesiti regExp za srbiju
     if (!RegExp(
-            r'^[a-zA-Z0-9а-џА-ШЂЈЉЊЋЏ][a-zA-Z0-9а-џА-ШЂЈЉЊЋЏ-]{1,61}[a-zA-Z0-9а-џА-ШЂЈЉЊЋЏ]\.[a-zA-Zа-џА-ШЂЈЉЊЋЏ]{2,}$')
+            r'^[a-zA-Z0-9а-џА-ШЂЈЉЊЋЏ][a-zA-Z0-9а-џА-ШЂЈЉЊЋЏ-]{1,61}[a-zA-Z0-9а-џА-ШЂЈЉЊЋЏ](\.[a-zA-Zа-џА-ШЂЈЉЊЋЏ]{2,})+$')
         .hasMatch(input)) return;
     setState(() {
       _waiting = true;

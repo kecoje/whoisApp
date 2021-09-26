@@ -16,6 +16,8 @@ import '../constants.dart';
 class WhoisProvider extends ChangeNotifier {
   WhoisProvider() : searchedDomains = [];
 
+  String? mail;
+
   static final historyListKey = GlobalKey<AnimatedListState>();
   static final favoritesListKey = GlobalKey<AnimatedListState>();
   static final alarmListKey = GlobalKey<AnimatedListState>();
@@ -31,7 +33,8 @@ class WhoisProvider extends ChangeNotifier {
   WhoisProvider.fromJson(Map<String, dynamic> json)
       : searchedDomains = (json["searchedDomains"] as List<dynamic>)
             .map((str) => DomainDetails.fromJson(str))
-            .toList();
+            .toList(),
+        mail = (json["mail"] != "" ? json["mail"] : null);
 
   Future<void> save() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -41,6 +44,7 @@ class WhoisProvider extends ChangeNotifier {
   Map<String, dynamic> toJson() {
     return {
       "searchedDomains": searchedDomains,
+      "mail": mail,
     };
   }
 
@@ -68,7 +72,7 @@ class WhoisProvider extends ChangeNotifier {
           DomainDetails? ddetails;
           if (decodedBody.containsKey("message") &&
               decodedBody["message"] == "Domen ne postoji") {
-              //DOMEN NIJE REGISTROVAN
+            //DOMEN NIJE REGISTROVAN
             ddetails = DomainDetails(
               name: text,
               isRegistered: false,
@@ -79,17 +83,15 @@ class WhoisProvider extends ChangeNotifier {
               name: text,
               owner: decodedBody["whoisOut"]["Registrant"],
               dateRegistered: DateTime.tryParse(
-                  decodedBody["whoisOut"]["Registration Date"]),
-              dateExpiring:
-                  DateTime.tryParse(decodedBody["whoisOut"]["Expiration Date"]),
+                  decodedBody["whoisOut"]["Registration Date"] ?? ""),
+              dateExpiring: DateTime.tryParse(
+                  decodedBody["whoisOut"]["Expiration Date"] ?? ""),
               registrar: decodedBody["whoisOut"]["Registrar"],
               registrarUrl: decodedBody["whoisOut"]["Registrar URL"],
               isRegistered: true,
             );
             if (decodedBody.containsKey("dnsOut")) {
-              ddetails.dnss.addAll((decodedBody["dnsOut"] as List<dynamic>)
-                  .where((str) => str.containsKey("address"))
-                  .map((str) => DnsModel.fromJson(str)));
+              ddetails.dns = DnsModel.fromJson(decodedBody["dnsOut"]);
             }
           }
           int? oldIndex;
@@ -107,7 +109,8 @@ class WhoisProvider extends ChangeNotifier {
             searchedDomains.insert(oldIndex, ddetails);
             ddetails.isAlarm = oldDetails.isAlarm;
             ddetails.isFavorite = oldDetails.isFavorite;
-            if(!ddetails.isRegistered) ddetails.isNewlyUnlocked = oldDetails.isNewlyUnlocked;
+            if (!ddetails.isRegistered)
+              ddetails.isNewlyUnlocked = oldDetails.isNewlyUnlocked;
           } else {
             //DOMEN PRVI PUT UCITAN
             searchedDomains.insert(0, ddetails);
@@ -144,6 +147,7 @@ class WhoisProvider extends ChangeNotifier {
         body: json.encode({
           'name': name,
           'token': token,
+          if (mail != null) 'email': mail,
         }),
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',

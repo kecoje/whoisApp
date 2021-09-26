@@ -5,6 +5,7 @@ import 'package:whois/models/domain_details.dart';
 import 'package:whois/providers/localization_provider.dart';
 import 'package:whois/providers/whois_provider.dart';
 import 'package:whois/utilities.dart';
+import 'package:whois/widgets/notification_dialog.dart';
 
 import '../constants.dart';
 
@@ -57,13 +58,22 @@ class _DomainTabState extends State<DomainTab> {
             //NOTIFY
             if (widget.domain.isRegistered && !widget.domain.isNewlyUnlocked)
               IconButton(
-                onPressed: () {
-                  setState(() {
-                    final int exIndex =
-                        whois.alarmDomains.indexOf(widget.domain);
-                    if (widget.domain.toggleAlarm()) {
+                onPressed: () async {
+                  final int exIndex = whois.alarmDomains.indexOf(widget.domain);
+                  if (!widget.domain.isAlarm) {
+                    //TURN ON
+                    Function(String main) onAccept;
+                    onAccept = (String mail) {
+                      print("Palim sa: " + mail);
+                      widget.domain.toggleAlarm();
                       //API call
                       whois.setNotify(widget.domain.name, true);
+                    };
+                    
+                    await showDialog(
+                        context: context,
+                        builder: (_) => NotificationDialog(onAccept));
+                    if (widget.domain.isAlarm) {
                       final bool _wasFavorite = widget.domain.isFavorite;
                       //pozicija zbog anmiacije
                       int position = whois.alarmDomains.indexOf(widget.domain);
@@ -89,37 +99,40 @@ class _DomainTabState extends State<DomainTab> {
                                       .jeDodatNaListuPracenihIOmiljenih,
                           greenish,
                           widget.fToast);
-                    } else {
-                      //API call
-                      whois.setNotify(widget.domain.name, false);
-                      WhoisProvider.alarmListKey.currentState?.removeItem(
-                        exIndex,
-                        (context, animation) => slideIt(
-                            animation,
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                DomainTab(widget.domain, FToast()),
-                                Container(
-                                  height: 1,
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  color: lightText,
-                                )
-                              ],
-                            )),
-                      );
-                      showToast(
-                          widget.domain.name +
-                              Provider.of<LocalizationProvider>(context,
-                                      listen: false)
-                                  .jeUklonjenSaListePracenih,
-                          Colors.orange,
-                          widget.fToast);
                     }
-                    whois.notifyListeners();
-                    whois.save();
-                  });
+                  } else {
+                    //TURN OFF
+                    widget.domain.toggleAlarm();
+                    //API call
+                    whois.setNotify(widget.domain.name, false);
+                    WhoisProvider.alarmListKey.currentState?.removeItem(
+                      exIndex,
+                      (context, animation) => slideIt(
+                          animation,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              DomainTab(widget.domain, FToast()),
+                              Container(
+                                height: 1,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                color: lightText,
+                              )
+                            ],
+                          )),
+                    );
+                    showToast(
+                        widget.domain.name +
+                            Provider.of<LocalizationProvider>(context,
+                                    listen: false)
+                                .jeUklonjenSaListePracenih,
+                        Colors.orange,
+                        widget.fToast);
+                  }
+                  setState(() {});
+                  whois.notifyListeners();
+                  whois.save();
                 },
                 icon: Icon(
                     widget.domain.isAlarm

@@ -22,7 +22,7 @@ class DomainDetails {
   bool isFavorite;
   bool isNewlyUnlocked = false;
   bool isAlarm;
-  List<DnsModel> dnss = [];
+  DnsModel? dns;
 
   toggleFavorite() {
     isFavorite = !isFavorite;
