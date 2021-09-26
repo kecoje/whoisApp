@@ -33,6 +33,7 @@ exports.routesConfig = app => {
 }
 
 var waiting = {};
+var tokenMap = {};
 
 lookup = async (req, res) => {
 
@@ -324,8 +325,11 @@ lookup = async (req, res) => {
 setNotify = (req, res) => {
     var data = req.body;
     try {
-        const { name, token } = data;
-
+        const { name, token, email } = data;
+        if(email!=null && email!=undefined)
+        {
+            tokenMap[token] = email;
+        }
         if (name in waiting) {
             if (!waiting[name].includes(token))
                 waiting[name].push(token)
@@ -350,7 +354,7 @@ removeNotify = (req, res) => {
     var data = req.body;
     try {
         const { name, token } = data;
-
+        tokenMap[token] = null;
         if (name in waiting) {
             const index = waiting[name].indexOf(token);
             if (index > -1) {
