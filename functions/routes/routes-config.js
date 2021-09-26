@@ -860,7 +860,7 @@ cron.schedule('*/100 * * * * *', () => {
                             to: tokenMap[tokencic], // list of receivers
                             subject: "Expiry Notification", // Subject line
                             text: notificationText, // plain text body
-                            html: '<h1 style="text-align: center;"><span style="color: #236fa1;"><strong>Neinzenjeri Whois</strong></span></h1>'
+                            html: '<h1 style="text-align: center;"><span style="color: #236fa1;"><strong>Ninzenjeri Whois</strong></span></h1>'
                                 + '<h2><img style="display: block; margin-left: auto; margin-right: auto;" src="https://drive.google.com/thumbnail?id=1quS3I6Vkq7_ARtXCajLHXwMvTX7ytkYK" alt="" width="100" height="100" /></h2>'
                                 + '<h2 style="text-align: center;"><span style="color: #236fa1;">Domen pod imenom ' + domainName + ' je istekao!</span></h2>'
                                 + '<p style="text-align: center;"><span style="color: #808080;"><strong>Domen:  ' + domainName + '</strong></span></p>'

@@ -29,6 +29,7 @@ class PushNotificationService {
       domd.isRegistered = false;
       domd.isNewlyUnlocked = true;
       domd.isAlarm = false;
+      whoisSingleton.save();
       whoisSingleton.notifyListeners();
     }
   }
@@ -52,6 +53,7 @@ class PushNotificationService {
       domd.isRegistered = false;
       domd.isNewlyUnlocked = true;
       domd.isAlarm = false;
+      whoisSingleton.save();
       whoisSingleton.notifyListeners();
     });
 
@@ -63,6 +65,7 @@ class PushNotificationService {
       domd.isRegistered = false;
       domd.isNewlyUnlocked = true;
       domd.isAlarm = false;
+      whoisSingleton.save();
       whoisSingleton.notifyListeners();
     });
 
