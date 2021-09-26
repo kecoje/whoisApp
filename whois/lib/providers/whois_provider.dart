@@ -68,11 +68,13 @@ class WhoisProvider extends ChangeNotifier {
           DomainDetails? ddetails;
           if (decodedBody.containsKey("message") &&
               decodedBody["message"] == "Domen ne postoji") {
+              //DOMEN NIJE REGISTROVAN
             ddetails = DomainDetails(
               name: text,
               isRegistered: false,
             );
           } else {
+            //DOMEN JE REGISTROVAN
             ddetails = DomainDetails(
               name: text,
               owner: decodedBody["whoisOut"]["Registrant"],
@@ -100,11 +102,14 @@ class WhoisProvider extends ChangeNotifier {
             }
           }
           if (oldIndex != null && oldDetails != null) {
+            //DOMEN PONOVO UCITAN
             searchedDomains.removeAt(oldIndex);
             searchedDomains.insert(oldIndex, ddetails);
             ddetails.isAlarm = oldDetails.isAlarm;
             ddetails.isFavorite = oldDetails.isFavorite;
+            if(!ddetails.isRegistered) ddetails.isNewlyUnlocked = oldDetails.isNewlyUnlocked;
           } else {
+            //DOMEN PRVI PUT UCITAN
             searchedDomains.insert(0, ddetails);
             historyListKey.currentState?.insertItem(0);
           }
