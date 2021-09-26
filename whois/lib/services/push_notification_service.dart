@@ -24,9 +24,11 @@ class PushNotificationService {
     if (initialMessage != null) {
       print("ON OPEN AFTER TERMINATION:" + initialMessage.notification!.title!);
       print(initialMessage.data);
-      final domd = whoisSingleton.searchedDomains.firstWhere((dd) => dd.name == initialMessage.data['unlock']);
+      final domd = whoisSingleton.searchedDomains
+          .firstWhere((dd) => dd.name == initialMessage.data['unlock']);
       domd.isRegistered = false;
       domd.isNewlyUnlocked = true;
+      domd.isAlarm = false;
       whoisSingleton.notifyListeners();
     }
   }
@@ -45,18 +47,22 @@ class PushNotificationService {
       // Parse the message received
       print("ON OPEN WHILE IN APP:" + message.notification!.title!);
       print(message.data);
-      final domd = whoisSingleton.searchedDomains.firstWhere((dd) => dd.name == message.data['unlock']);
+      final domd = whoisSingleton.searchedDomains
+          .firstWhere((dd) => dd.name == message.data['unlock']);
       domd.isRegistered = false;
       domd.isNewlyUnlocked = true;
+      domd.isAlarm = false;
       whoisSingleton.notifyListeners();
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print("ON OPEN WHILE IN BACKGROUND:" + message.notification!.title!);
       print(message.data);
-      final domd = whoisSingleton.searchedDomains.firstWhere((dd) => dd.name == message.data['unlock']);
+      final domd = whoisSingleton.searchedDomains
+          .firstWhere((dd) => dd.name == message.data['unlock']);
       domd.isRegistered = false;
       domd.isNewlyUnlocked = true;
+      domd.isAlarm = false;
       whoisSingleton.notifyListeners();
     });
 

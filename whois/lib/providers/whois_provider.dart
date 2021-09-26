@@ -87,13 +87,17 @@ class WhoisProvider extends ChangeNotifier {
             ddetails.isFaulty = true;
           } else {
             //DOMEN JE REGISTROVAN
+            final regDateData = decodedBody["whoisOut"]["Registration Date"];
+            final expDateData = decodedBody["whoisOut"]["Expiration Date"];
             ddetails = DomainDetails(
               name: text,
               owner: decodedBody["whoisOut"]["Registrant"],
-              dateRegistered: DateTime.fromMillisecondsSinceEpoch(
-                  decodedBody["whoisOut"]["Registration Date"] ?? 0),
-              dateExpiring: DateTime.fromMillisecondsSinceEpoch(
-                  decodedBody["whoisOut"]["Expiration Date"] ?? 0),
+              dateRegistered: (regDateData is! String && regDateData != null)
+                  ? DateTime.fromMillisecondsSinceEpoch(regDateData)
+                  : null,
+              dateExpiring: (expDateData is! String && expDateData != null)
+                  ? DateTime.fromMillisecondsSinceEpoch(expDateData)
+                  : null,
               registrar: decodedBody["whoisOut"]["Registrar"],
               registrarUrl: decodedBody["whoisOut"]["Registrar URL"],
               isRegistered: true,

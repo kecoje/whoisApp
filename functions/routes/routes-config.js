@@ -125,6 +125,63 @@ function toUnixTime(datum) {
         }
         return Date.parse(year + "-" + month + "-" + day)
     }
+    if (datum.toString()[2] >= 'a' && datum.toString()[2] <= 'z' &&
+    datum.toString()[1] >= '0' && datum.toString()[1] <= '9') {
+        let day = datum.substring(0, 2)
+        let month = datum.substring(5, 8)
+        let year = datum.substring(datum.length - 5)
+        switch (month) {
+            case 'Jan': {
+                month = 1
+                break
+            }
+            case 'Feb': {
+                month = 2
+                break
+            }
+            case 'Mar': {
+                month = 3
+                break
+            }
+            case 'Apr': {
+                month = 4
+                break
+            }
+            case 'May': {
+                month = 5
+                break
+            }
+            case 'Jun': {
+                month = 6
+                break
+            }
+            case 'Jul': {
+                month = 7
+                break
+            }
+            case 'Aug': {
+                month = 8
+                break
+            }
+            case 'Sep': {
+                month = 9
+                break
+            }
+            case 'Oct': {
+                month = 10
+                break
+            }
+            case 'Nov': {
+                month = 11
+                break
+            }
+            case 'Dec': {
+                month = 12
+                break
+            }
+        }
+        return Date.parse(year + "-" + month + "-" + day)
+    }
     return datum;
 }
 
@@ -275,21 +332,27 @@ lookup = async (req, res) => {
             "server": baza[domLst]
         }, function (err, data) {
             var match;
-            if (domLst.valueOf() == "uk") {
+            if (domLst.valueOf() == "uk" || domLst.valueOf() == "gg") {
                 data = data.replace(/ {2,}/gm, " ")
                 data = data.replace(/:(\r\n|\n|\r)/gm, ": ");
-                //console.log(data)
+                console.log(data)
                 regx = /[dD]omain [Nn]ame:[ ]*(.*)/g
                 dnResReg = (regx.exec(data))
                 if (dnResReg != null) {
                     dnRes = dnResReg[1]
                 } else {
-                    res.send({
-                        "message": "Domen ne postoji"
-                    });
-                    return;
+                    regx = /[dD]omain:[ ]*(.*)/g
+                    dnResReg = (regx.exec(data))
+                    if (dnResReg != null) {
+                        dnRes = dnResReg[1]
+                    } else {
+                        res.send({
+                            "message": "Domen ne postoji"
+                        });
+                        return;
+                    }
                 }
-                regx = /[rR]egistered [Oo]n:[ ]*(.*)/gm
+                regx = /[rR]egistered [Oo]n:?[ ]*(.*)/gm
                 dnResReg = (regx.exec(data))
                 if (dnResReg != null) {
                     rdRes = dnResReg[1]
@@ -301,7 +364,14 @@ lookup = async (req, res) => {
                 if (dnResReg != null) {
                     edRes = dnResReg[1]
                 } else {
-                    edRes = null
+                    regx = /[Rr]egistry fee due on[ ]*(.*) each year/gm
+                    dnResReg = (regx.exec(data))
+                    if (dnResReg != null) {
+                        edRes = dnResReg[1] + " " + (new Date().getFullYear())
+                    }
+                    else {
+                        edRes = null
+                    }
                 }
                 regx = /[Rr]egistrar:[ ]*(.*)/gm
                 dnResReg = (regx.exec(data))
@@ -333,17 +403,7 @@ lookup = async (req, res) => {
                         "Registrar URL": registrarUrlRes,
                         "Registrant": registrantRes,
                     },
-                    "dnsOut": {
-                        "IPV4 address": ipv4Ret,
-                        "IPV6 address": ipv6Ret,
-                        "CNAME": ipvcnameRet,
-                        "CAA": ipcaaret,
-                        "MX": ipmxret,
-                        "NAPTR": ipnptrret,
-                        "SOA": ipsoaret,
-                        "SRV": ipsrvret,
-                        "TXT": iptxtret
-                    }
+                    dnsOut
                 });
                 return
             }

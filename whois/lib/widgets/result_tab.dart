@@ -44,7 +44,11 @@ class _ResultTabState extends State<ResultTab> {
                   ? launch("https://" + widget.data.name)
                   : null
               : null,
-          color: widget.data.isFaulty ? Colors.orange : widget.data.isRegistered ? redish : greenish,
+          color: widget.data.isFaulty
+              ? Colors.orange
+              : widget.data.isRegistered
+                  ? redish
+                  : greenish,
         ),
         if (widget.data.isRegistered) ...[
           Container(
@@ -149,39 +153,40 @@ class _ResultTabState extends State<ResultTab> {
                 ],
               ),
             ),
-          AnimatedSize(
-            duration: Duration(milliseconds: 500),
-            child: _hidden && widget.data.dns != null
-                ? const SizedBox(
-                    width: double.infinity,
-                  )
-                : Column(
-                    children: [
-                      ...widget.data.dns!.ipv4Adresses.map(
-                        (v4adr) => Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 16),
-                          child: Text(
-                            v4adr,
-                            style: TextStyle(fontSize: 16),
+          if (widget.data.dns != null)
+            AnimatedSize(
+              duration: Duration(milliseconds: 500),
+              child: _hidden
+                  ? const SizedBox(
+                      width: double.infinity,
+                    )
+                  : Column(
+                      children: [
+                        ...widget.data.dns!.ipv4Adresses.map(
+                          (v4adr) => Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 16),
+                            child: Text(
+                              v4adr,
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ),
                         ),
-                      ),
-                      ...widget.data.dns!.ipv6Adresses.map(
-                        (v4adr) => Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 8, horizontal: 16),
-                          child: Text(
-                            v4adr,
-                            style: TextStyle(fontSize: 16),
+                        ...widget.data.dns!.ipv6Adresses.map(
+                          (v4adr) => Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 16),
+                            child: Text(
+                              v4adr,
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ),
-                        ),
-                      )
-                    ],
-                  ),
-          ),
+                        )
+                      ],
+                    ),
+            ),
           if (widget.data.dns != null && false)
             Container(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -193,19 +198,23 @@ class _ResultTabState extends State<ResultTab> {
               ),
             ),
         ] else
-          widget.data.isFaulty ? Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-            child: Text(
-              Provider.of<LocalizationProvider>(context).greska,
-              style: TextStyle(fontSize: 18),
-            ),
-          ) : Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-            child: Text(
-              Provider.of<LocalizationProvider>(context).domenJeSlobodan,
-              style: TextStyle(fontSize: 18),
-            ),
-          ),
+          widget.data.isFaulty
+              ? Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  child: Text(
+                    Provider.of<LocalizationProvider>(context).greska,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                )
+              : Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  child: Text(
+                    Provider.of<LocalizationProvider>(context).domenJeSlobodan,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
       ],
     );
   }
