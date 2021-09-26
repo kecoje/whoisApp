@@ -15,7 +15,6 @@
   "main": "index.js",
   "dependencies": {
     "cors": "^2.8.5",
-    "crone": "0.0.1",
     "dns": "^0.2.2",
     "express": "^4.17.1",
     "firebase": "^9.1.0",
