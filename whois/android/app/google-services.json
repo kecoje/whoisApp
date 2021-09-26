@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "545230470188",
+    "project_id": "nwhois-1f171",
+    "storage_bucket": "nwhois-1f171.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545230470188:android:e2bf54ae9fe242b873e589",
+        "android_client_info": {
+          "package_name": "com.ninzenjeri.whois"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "545230470188-jl6fn53k4qd85m4fcof2ui7394ns2m5t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSZzsE__rYQxasYyenwuwZg9AVRUJN7B0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "545230470188-jl6fn53k4qd85m4fcof2ui7394ns2m5t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
