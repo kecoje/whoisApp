@@ -244,33 +244,43 @@ lookup = async (req, res) => {
         try {
             for (var j = 0; j < 3; j++) {
                 if (!foundv4) {
+                    try{
                     dns.resolve4(adr, (err, ret) => {
+                        console.log("ipv4 - " + ret)
                         ipv4Ret = ret
 
                         if (!(ipv4Ret === undefined)) {
                             foundv4 = true;
                         }
                     });
+                    } catch (e) {}
                 }
                 if (!foundv6) {
+                    try{
                     dns.resolve6(adr, (err, ret) => {
+                        console.log("ipv6 - " + ret)
                         ipv6Ret = ret
 
                         if (!(ipv6Ret === undefined)) {
                             foundv6 = true;
                         }
                     });
+                    } catch (e) {}
                 }
                 if (!foundcname) {
+                    try{
                     dns.resolveCname(adr, (err, ret) => {
+                        console.log("ipvCname - " + ret)
                         ipvcnameRet = ret
                         if (!(ipvcnameRet === undefined)) {
                             foundcname = true;
                         }
                     });
+                    } catch (e) {}
                 }
 
                 if (!foundmx) {
+                    try{
                     dns.resolveMx(adr, (err, ret) => {
                         ipmxret = ret
 
@@ -278,8 +288,10 @@ lookup = async (req, res) => {
                             foundmx = true;
                         }
                     });
+                    } catch (e) {}
                 }
                 if (!foundnptr) {
+                    try{
                     dns.resolveNaptr(adr, (err, ret) => {
                         ipnptrret = ret
 
@@ -287,8 +299,10 @@ lookup = async (req, res) => {
                             foundnptr = true;
                         }
                     });
+                    } catch (e) {}
                 }
                 if (!foundsoa) {
+                    try{
                     dns.resolveSoa(adr, (err, ret) => {
                         ipsoaret = ret
 
@@ -296,8 +310,10 @@ lookup = async (req, res) => {
                             foundsoa = true;
                         }
                     });
+                    } catch (e) {}
                 }
                 if (!foundsrv) {
+                    try{
                     dns.resolveSrv(adr, (err, ret) => {
                         ipsrvret = ret
 
@@ -305,8 +321,10 @@ lookup = async (req, res) => {
                             foundsrv = true;
                         }
                     });
+                    } catch (e) {}
                 }
                 if (!foundtxt) {
+                    try{
                     dns.resolveTxt(adr, (err, ret) => {
                         iptxtret = ret
 
@@ -314,8 +332,10 @@ lookup = async (req, res) => {
                             foundtxt = true;
                         }
                     });
+                    } catch (e) {}
                 }
                 if (!foundcaa) {
+                    try{
                     dns.resolveCaa(adr, (err, ret) => {
                         ipcaaret = ret
 
@@ -323,11 +343,10 @@ lookup = async (req, res) => {
                             foundcaa = true;
                         }
                     });
+                    } catch (e) {}
                 }
             }
-        } catch (e) {
-
-        }
+        } catch (e) { }
         whois.lookup(adr, {
             "server": baza[domLst]
         }, function (err, data) {
@@ -403,7 +422,17 @@ lookup = async (req, res) => {
                         "Registrar URL": registrarUrlRes,
                         "Registrant": registrantRes,
                     },
-                    dnsOut
+                    "dnsOut": {
+                        "IPV4 address": ipv4Ret,
+                        "IPV6 address": ipv6Ret,
+                        "CNAME": ipvcnameRet,
+                        "CAA": ipcaaret,
+                        "MX": ipmxret,
+                        "NAPTR": ipnptrret,
+                        "SOA": ipsoaret,
+                        "SRV": ipsrvret,
+                        "TXT": iptxtret
+                    }
                 });
                 return
             }
