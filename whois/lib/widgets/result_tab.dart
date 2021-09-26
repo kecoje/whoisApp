@@ -21,6 +21,7 @@ class ResultTab extends StatefulWidget {
 class _ResultTabState extends State<ResultTab> {
   bool _dnsAddressHidden = true;
   bool _mailAddressHidden = true;
+  bool _nameServersHidden = true;
 
   late FToast fToast;
 
@@ -196,7 +197,7 @@ class _ResultTabState extends State<ResultTab> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    Provider.of<LocalizationProvider>(context).mejlServer,
+                    Provider.of<LocalizationProvider>(context).mejlServeri,
                     style: TextStyle(fontSize: 18),
                   ),
                   const Spacer(),
@@ -225,19 +226,73 @@ class _ResultTabState extends State<ResultTab> {
                       width: double.infinity,
                     )
                   : Column(
-                      children: widget.data.dns!.mailServers.map(
-                          (v4adr) => Container(
-                            color: lightText,
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8, horizontal: 16),
-                            child: Text(
-                              v4adr,
-                              style: TextStyle(fontSize: 16),
+                      children: widget.data.dns!.mailServers
+                          .map(
+                            (v4adr) => Container(
+                              color: lightText,
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 16),
+                              child: Text(
+                                v4adr,
+                                style: TextStyle(fontSize: 16),
+                              ),
                             ),
-                          ),
-                        ).toList()
-                      ,
+                          )
+                          .toList(),
+                    ),
+            ),
+          if (widget.data.dns != null)
+            Container(
+              color: lightText,
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    Provider.of<LocalizationProvider>(context).nameServeri,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _nameServersHidden = !_nameServersHidden;
+                      });
+                    },
+                    icon: Icon(
+                        _nameServersHidden
+                            ? Icons.arrow_drop_up_sharp
+                            : Icons.arrow_drop_down_sharp,
+                        size: 32),
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                  )
+                ],
+              ),
+            ),
+          if (widget.data.dns != null)
+            AnimatedSize(
+              duration: Duration(milliseconds: 500),
+              child: _nameServersHidden
+                  ? const SizedBox(
+                      width: double.infinity,
+                    )
+                  : Column(
+                      children: widget.data.dns!.nameServers
+                          .map(
+                            (v4adr) => Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 16),
+                              child: Text(
+                                v4adr,
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          )
+                          .toList(),
                     ),
             ),
         ] else

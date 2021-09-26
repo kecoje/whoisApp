@@ -126,7 +126,7 @@ function toUnixTime(datum) {
         return Date.parse(year + "-" + month + "-" + day)
     }
     if (datum.toString()[2] >= 'a' && datum.toString()[2] <= 'z' &&
-    datum.toString()[1] >= '0' && datum.toString()[1] <= '9') {
+        datum.toString()[1] >= '0' && datum.toString()[1] <= '9') {
         let day = datum.substring(0, 2)
         let month = datum.substring(5, 8)
         let year = datum.substring(datum.length - 5)
@@ -241,109 +241,134 @@ lookup = async (req, res) => {
         var foundsoa = false;
         var foundsrv = false;
         var foundtxt = false;
+        var foundAny = false;
+        var foundNameSrv = false;
+        var anyret;
+        var nsRet;
         try {
             for (var j = 0; j < 3; j++) {
                 if (!foundv4) {
-                    try{
-                    dns.resolve4(adr, (err, ret) => {
-                        console.log("ipv4 - " + ret)
-                        ipv4Ret = ret
+                    try {
+                        dns.resolve4(adr, (err, ret) => {
+                            console.log("ipv4 - " + ret)
+                            ipv4Ret = ret
 
-                        if (!(ipv4Ret === undefined)) {
-                            foundv4 = true;
-                        }
-                    });
-                    } catch (e) {}
+                            if (!(ipv4Ret === undefined)) {
+                                foundv4 = true;
+                            }
+                        });
+                    } catch (e) { }
                 }
                 if (!foundv6) {
-                    try{
-                    dns.resolve6(adr, (err, ret) => {
-                        console.log("ipv6 - " + ret)
-                        ipv6Ret = ret
+                    try {
+                        dns.resolve6(adr, (err, ret) => {
+                            console.log("ipv6 - " + ret)
+                            ipv6Ret = ret
 
-                        if (!(ipv6Ret === undefined)) {
-                            foundv6 = true;
-                        }
-                    });
-                    } catch (e) {}
+                            if (!(ipv6Ret === undefined)) {
+                                foundv6 = true;
+                            }
+                        });
+                    } catch (e) { }
                 }
                 if (!foundcname) {
-                    try{
-                    dns.resolveCname(adr, (err, ret) => {
-                        console.log("ipvCname - " + ret)
-                        ipvcnameRet = ret
-                        if (!(ipvcnameRet === undefined)) {
-                            foundcname = true;
-                        }
-                    });
-                    } catch (e) {}
+                    try {
+                        dns.resolveCname(adr, (err, ret) => {
+                            console.log("ipvCname - " + ret)
+                            ipvcnameRet = ret
+                            if (!(ipvcnameRet === undefined)) {
+                                foundcname = true;
+                            }
+                        });
+                    } catch (e) { }
                 }
-
                 if (!foundmx) {
-                    try{
-                    dns.resolveMx(adr, (err, ret) => {
-                        ipmxret = ret
+                    try {
+                        dns.resolveMx(adr, (err, ret) => {
+                            ipmxret = ret
 
-                        if (!(ipmxret === undefined)) {
-                            foundmx = true;
-                        }
-                    });
-                    } catch (e) {}
+                            if (!(ipmxret === undefined)) {
+                                foundmx = true;
+                            }
+                        });
+                    } catch (e) { }
                 }
                 if (!foundnptr) {
-                    try{
-                    dns.resolveNaptr(adr, (err, ret) => {
-                        ipnptrret = ret
+                    try {
+                        dns.resolveNaptr(adr, (err, ret) => {
+                            ipnptrret = ret
 
-                        if (!(ipnptrret === undefined)) {
-                            foundnptr = true;
-                        }
-                    });
-                    } catch (e) {}
+                            if (!(ipnptrret === undefined)) {
+                                foundnptr = true;
+                            }
+                        });
+                    } catch (e) { }
                 }
                 if (!foundsoa) {
-                    try{
-                    dns.resolveSoa(adr, (err, ret) => {
-                        ipsoaret = ret
+                    try {
+                        dns.resolveSoa(adr, (err, ret) => {
+                            ipsoaret = ret
 
-                        if (!(ipsoaret === undefined)) {
-                            foundsoa = true;
-                        }
-                    });
-                    } catch (e) {}
+                            if (!(ipsoaret === undefined)) {
+                                foundsoa = true;
+                            }
+                        });
+                    } catch (e) { }
                 }
                 if (!foundsrv) {
-                    try{
-                    dns.resolveSrv(adr, (err, ret) => {
-                        ipsrvret = ret
+                    try {
+                        dns.resolveSrv(adr, (err, ret) => {
+                            ipsrvret = ret
 
-                        if (!(ipsrvret === undefined)) {
-                            foundsrv = true;
-                        }
-                    });
-                    } catch (e) {}
+                            if (!(ipsrvret === undefined)) {
+                                foundsrv = true;
+                            }
+                        });
+                    } catch (e) { }
                 }
                 if (!foundtxt) {
-                    try{
-                    dns.resolveTxt(adr, (err, ret) => {
-                        iptxtret = ret
+                    try {
+                        dns.resolveTxt(adr, (err, ret) => {
+                            iptxtret = ret
 
-                        if (!(iptxtret === undefined)) {
-                            foundtxt = true;
-                        }
-                    });
-                    } catch (e) {}
+                            if (!(iptxtret === undefined)) {
+                                foundtxt = true;
+                            }
+                        });
+                    } catch (e) { }
                 }
                 if (!foundcaa) {
-                    try{
-                    dns.resolveCaa(adr, (err, ret) => {
-                        ipcaaret = ret
+                    try {
+                        dns.resolveCaa(adr, (err, ret) => {
+                            ipcaaret = ret
 
-                        if (!(ipcaaret === undefined)) {
-                            foundcaa = true;
-                        }
-                    });
-                    } catch (e) {}
+                            if (!(ipcaaret === undefined)) {
+                                foundcaa = true;
+                            }
+                        });
+                    } catch (e) { }
+                }
+                if (!foundAny) {
+                    try {
+                        dns.resolveAny(adr, (err, ret) => {
+                            anyret = ret
+
+                            if (!(anyret === undefined)) {
+                                foundAny = true;
+                            }
+                        });
+                    } catch (e) { }
+                }
+                if (!foundNameSrv) {
+                    try {
+                        dns.resolveNs(adr, (err, ret) => {
+                            nsRet = ret
+
+                            if (!(nsRet === undefined)) {
+                                foundNameSrv = true;
+                            }
+                        });
+                    } catch (e) { }
                 }
             }
         } catch (e) { }
@@ -431,7 +456,9 @@ lookup = async (req, res) => {
                         "NAPTR": ipnptrret,
                         "SOA": ipsoaret,
                         "SRV": ipsrvret,
-                        "TXT": iptxtret
+                        "TXT": iptxtret,
+                        "ANY": anyret,
+                        "NS": nsRet
                     }
                 });
                 return
@@ -609,7 +636,9 @@ lookup = async (req, res) => {
                     "NAPTR": ipnptrret,
                     "SOA": ipsoaret,
                     "SRV": ipsrvret,
-                    "TXT": iptxtret
+                    "TXT": iptxtret,
+                    "ANY": anyret,
+                    "NS": nsRet
                 }
             });
         })
@@ -710,7 +739,7 @@ getExp = async (address, callback) => {
             "server": baza[domLst]
         }, function (err, data) {
 
-            if (domLst.valueOf() == "uk") {
+            if (domLst.valueOf() == "uk" || domLst.valueOf() == "gg") {
                 data = data.replace(/ {2,}/gm, " ")
                 data = data.replace(/:(\r\n|\n|\r)/gm, ": ");
                 regx = /[dD]omain [Nn]ame:[ ]*(.*)/g
@@ -718,72 +747,82 @@ getExp = async (address, callback) => {
                 if (dnResReg != null) {
                     dnRes = dnResReg[1]
                 } else {
-                    res.send({
-                        "message": "Domen ne postoji"
-                    });
-                    return;
+                    regx = /[dD]omain:[ ]*(.*)/g
+                    dnResReg = (regx.exec(data))
+                    if (dnResReg != null) {
+                        dnRes = dnResReg[1]
+                    } else {
+                        return null;
+                    }
                 }
                 regx = /[eE]xpiry date:[ ]*(.*)/gm
                 dnResReg = (regx.exec(data))
                 if (dnResReg != null) {
                     edRes = dnResReg[1]
                 } else {
-                    edRes = null
+                    regx = /[Rr]egistry fee due on[ ]*(.*) each year/gm
+                    dnResReg = (regx.exec(data))
+                    if (dnResReg != null) {
+                        edRes = dnResReg[1] + " " + (new Date().getFullYear())
+                    }
+                    else {
+                        edRes = null
+                    }
                 }
                 callback(toUnixTime(edRes))
-            }
 
-            var match;
-
-            var regx = /[dD]omain [nN]ame: ([^(\\\r\\\n)]*)/g
-            var dnResReg = (regx.exec(data))
-            var dnRes = null
-            if (dnResReg != null) {
-                dnRes = dnResReg[1]
             } else {
-                regx = /[dD]omain: ([^(\\r\\\n)]*)/g
-                dnResReg = (regx.exec(data))
+                var match;
+
+                var regx = /[dD]omain [nN]ame: ([^(\\\r\\\n)]*)/g
+                var dnResReg = (regx.exec(data))
+                var dnRes = null
                 if (dnResReg != null) {
                     dnRes = dnResReg[1]
+                } else {
+                    regx = /[dD]omain: ([^(\\r\\\n)]*)/g
+                    dnResReg = (regx.exec(data))
+                    if (dnResReg != null) {
+                        dnRes = dnResReg[1]
+                    }
+                    else {
+                        return null;
+                    }
                 }
-                else {
-                    res.send({
-                        "message": "Domen ne postoji"
-                    });
-                    return;
-                }
-            }
 
-            regx = /[eE]xpiration [dD]ate: ([^(\\\r\\\n)]*)/g
-            var edResReg = (regx.exec(data))
-            var edRes = null
-            if (edResReg != null) {
-                edRes = edResReg[1]
-            }
-            else {
-                regx = /[pP]aid-till: ([^(\\\r\\\n)]*)/g
+                regx = /[eE]xpiration [dD]ate: ([^(\\\r\\\n)]*)/g
                 var edResReg = (regx.exec(data))
                 var edRes = null
                 if (edResReg != null) {
                     edRes = edResReg[1]
                 }
                 else {
-                    regx = /[eE]xpire[s]?: ([^(\\\r\\\n)]*)/g
+                    regx = /[pP]aid-till: ([^(\\\r\\\n)]*)/g
                     var edResReg = (regx.exec(data))
                     var edRes = null
                     if (edResReg != null) {
                         edRes = edResReg[1]
                     }
+                    else {
+                        regx = /[eE]xpire[s]?: ([^(\\\r\\\n)]*)/g
+                        var edResReg = (regx.exec(data))
+                        var edRes = null
+                        if (edResReg != null) {
+                            edRes = edResReg[1]
+                        }
+                    }
                 }
-            }
-            if (edRes != null) {
-                edRes = edRes.replace(/ {2,}/g, " ")
-                if (edRes[0] == ' ') {
-                    edRes = edRes.substring(1, edRes.length)
+                if (edRes != null) {
+                    edRes = edRes.replace(/ {2,}/g, " ")
+                    if (edRes[0] == ' ') {
+                        edRes = edRes.substring(1, edRes.length)
+                    }
                 }
+
+                callback(toUnixTime(edRes))
             }
 
-            callback(toUnixTime(edRes))
+
         })
 
     }
@@ -813,12 +852,19 @@ cron.schedule('*/100 * * * * *', () => {
                     notificationText = "Domain name " + domainName + " has expired";
 
                     if (tokencic in tokenMap && tokenMap[tokencic] !== null && tokenMap[tokencic] !== undefined) {
+                        var today = new Date();
+                        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+                        
                         transporter.sendMail({
                             from: '"Ninzenjeri Whois" <ninzenjeri@gmail.com>', // sender address
                             to: tokenMap[tokencic], // list of receivers
                             subject: "Expiry Notification", // Subject line
                             text: notificationText, // plain text body
-                            html: "<b>" + notificationText + "</b>", // html body
+                            html: '<h1 style="text-align: center;"><span style="color: #236fa1;"><strong>Neinzenjeri Whois</strong></span></h1>'
+                                + '<h2><img style="display: block; margin-left: auto; margin-right: auto;" src="https://drive.google.com/thumbnail?id=1quS3I6Vkq7_ARtXCajLHXwMvTX7ytkYK" alt="" width="100" height="100" /></h2>'
+                                + '<h2 style="text-align: center;"><span style="color: #236fa1;">Domen pod imenom ' + domainName + ' je istekao!</span></h2>'
+                                + '<p style="text-align: center;"><span style="color: #808080;"><strong>Domen:  ' + domainName + '</strong></span></p>'
+                                + '<p style="text-align: center;"><span style="color: #808080;"><strong>Datum:  ' + date + '</strong></span></p>',
                         });
                     }
 
