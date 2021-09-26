@@ -1,4 +1,5 @@
 const { Application } = require("express");
+const nodemailer = require("nodemailer");
 const whois = require('whois')
 const punycode = require('punycode');
 function isASCII(str) { return /^[\x00-\x7F]*$/.test(str); }
@@ -16,6 +17,21 @@ admin.initializeApp({
 //admin.initializeApp(functions.config().firebase);
 
 const fcm = admin.messaging();
+
+var transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    type: "SMTP",
+    auth: {
+        user: 'ninzenjeri@gmail.com',
+        pass: 'smiled3go'
+    },
+    tls: {
+        rejectUnauthorized: false
+    },
+    secure:true,
+    debug:true
+});
 
 exports.routesConfig = app => {
     // looks up whois and dns
@@ -37,6 +53,7 @@ function replaceAll(str, find, replace) {
 }
 
 var waiting = {};
+var tokenMap = {};
 
 function toUnixTime(datum) {
     if (datum.toString()[4] == '-') {
@@ -500,8 +517,11 @@ lookup = async (req, res) => {
 setNotify = (req, res) => {
     var data = req.body;
     try {
-        const { name, token } = data;
-
+        const { name, token, email } = data;
+        if(email!=null && email!=undefined)
+        {
+            tokenMap[token] = email;
+        }
         if (name in waiting) {
             if (!waiting[name].includes(token))
                 waiting[name].push(token)
@@ -528,7 +548,7 @@ removeNotify = (req, res) => {
     var data = req.body;
     try {
         const { name, token } = data;
-
+        delete tokenMap[token];
         if (name in waiting) {
             const index = waiting[name].indexOf(token);
             if (index > -1) {
@@ -598,7 +618,7 @@ getExp = async (address, callback) => {
     }
 };
 
-cron.schedule('*/100 * * * * *', () => {
+cron.schedule('*/10 * * * * *', () => {
     console.log('running a task in 100 seconds');
     //console.log("kurac");
     for (const [domainName, tokenArray] of Object.entries(waiting)) {
@@ -611,13 +631,25 @@ cron.schedule('*/100 * * * * *', () => {
         getExp(domainName, (expmilisec) => {
             // ask if current time is equal to the expiration time
             //Nameran bag (true)
-            if (milisec > Date.parse(expmilisec) || true) {
+            console.log(toUnixTime(expmilisec));
+            if (milisec > toUnixTime(expmilisec) || true) {
                 // if yes then send the notification using all the tokens
                 while (tokenArray !== undefined && tokenArray.length > 0) {
                     tokencic = tokenArray.pop();
+                    notificationText = "Domain name " + domainName + " has expired";
+                    
+                    if(tokenMap[tokencic] !== null && tokenMap[tokencic] !== undefined){
+                        transporter.sendMail({
+                            from: '"Ninzenjeri Whois" <ninzenjeri@gmail.com>', // sender address
+                            to: tokenMap[tokencic], // list of receivers
+                            subject: "Expiry Notification", // Subject line
+                            text: notificationText, // plain text body
+                            html: "<b>"+notificationText+"</b>", // html body
+                          });
+                    }
 
                     notification = {
-                        title: "Domain name " + domainName + " has expired",
+                        title: notificationText,
                         body: "Click here to check current status",
                         token: tokencic,
                     }
@@ -640,6 +672,7 @@ cron.schedule('*/100 * * * * *', () => {
                     fcm.sendToDevice(notification.token, payload);
                 }
             }
+            delete waiting[domainName];
         })
     }
 })
