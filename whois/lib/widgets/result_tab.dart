@@ -19,7 +19,8 @@ class ResultTab extends StatefulWidget {
 }
 
 class _ResultTabState extends State<ResultTab> {
-  bool _hidden = true;
+  bool _dnsAddressHidden = true;
+  bool _mailAddressHidden = true;
 
   late FToast fToast;
 
@@ -139,11 +140,11 @@ class _ResultTabState extends State<ResultTab> {
                   IconButton(
                     onPressed: () {
                       setState(() {
-                        _hidden = !_hidden;
+                        _dnsAddressHidden = !_dnsAddressHidden;
                       });
                     },
                     icon: Icon(
-                        _hidden
+                        _dnsAddressHidden
                             ? Icons.arrow_drop_up_sharp
                             : Icons.arrow_drop_down_sharp,
                         size: 32),
@@ -156,7 +157,7 @@ class _ResultTabState extends State<ResultTab> {
           if (widget.data.dns != null)
             AnimatedSize(
               duration: Duration(milliseconds: 500),
-              child: _hidden
+              child: _dnsAddressHidden
                   ? const SizedBox(
                       width: double.infinity,
                     )
@@ -187,15 +188,57 @@ class _ResultTabState extends State<ResultTab> {
                       ],
                     ),
             ),
-          if (widget.data.dns != null && false)
+          if (widget.data.dns != null)
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-              child: Text(
-                Provider.of<LocalizationProvider>(context).mejlServer +
-                    ": " +
-                    (widget.data.dns!.mailServer ?? nepoznato),
-                style: TextStyle(fontSize: 18),
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    Provider.of<LocalizationProvider>(context).mejlServer,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        _mailAddressHidden = !_mailAddressHidden;
+                      });
+                    },
+                    icon: Icon(
+                        _mailAddressHidden
+                            ? Icons.arrow_drop_up_sharp
+                            : Icons.arrow_drop_down_sharp,
+                        size: 32),
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                  )
+                ],
               ),
+            ),
+          if (widget.data.dns != null)
+            AnimatedSize(
+              duration: Duration(milliseconds: 500),
+              child: _mailAddressHidden
+                  ? const SizedBox(
+                      width: double.infinity,
+                    )
+                  : Column(
+                      children: widget.data.dns!.mailServers.map(
+                          (v4adr) => Container(
+                            color: lightText,
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8, horizontal: 16),
+                            child: Text(
+                              v4adr,
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ).toList()
+                      ,
+                    ),
             ),
         ] else
           widget.data.isFaulty

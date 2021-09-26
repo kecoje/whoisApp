@@ -1,5 +1,5 @@
 class DnsModel {
-  DnsModel(this.ipv4Adresses, this.ipv6Adresses);
+  DnsModel(this.ipv4Adresses, this.ipv6Adresses, this.mailServers);
 
   DnsModel.fromJson(Map<String, dynamic> json)
       : ipv4Adresses = json.containsKey("IPV4 address")
@@ -12,9 +12,13 @@ class DnsModel {
                 .map((adr) => adr as String)
                 .toList()
             : [],
-        mailServer = json.containsKey("MX") ? json["MX"][0]["exchange"] : null;
+        mailServers = json.containsKey("MX")
+            ? (json["MX"] as List<dynamic>)
+                .map((adr) => adr["exchange"] as String)
+                .toList()
+            : [];
 
   List<String> ipv4Adresses;
   List<String> ipv6Adresses;
-  String? mailServer;
+  List<String> mailServers;
 }

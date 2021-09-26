@@ -76,7 +76,7 @@ class LocalizationProvider extends ChangeNotifier {
   String get registar => _l ? "Registar" : "Регистар";
   String get registarUrl => _l ? "Registar URL" : "Регистар УРЛ";
   String get dnsAdrese => _l ? "DNS adrese" : "ДНС адресе";
-  String get mejlServer => _l ? "Mejl server" : "Мејл сервер";
+  String get mejlServer => _l ? "Mejl serveri" : "Мејл сервери";
   String get domenJeSlobodan => _l ? "Domen je slobodan" : "Домен је слободан";
 
   String get oslobodjen => _l ? "oslobođen" : "ослобођен";
