@@ -31,10 +31,13 @@ exports.routesConfig = app => {
         removeNotify
     );
 }
+
 function replaceAll(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
 }
+
 var waiting = {};
+
 function toUnixTime(datum) {
     if (datum.toString()[4] == '-') {
         return Date.parse(datum.toString().substring(0, 10))
@@ -274,7 +277,17 @@ lookup = async (req, res) => {
                         "Registrar URL": registrarUrlRes,
                         "Registrant": registrantRes,
                     },
-                    dnsOut
+                    "dnsOut": {
+                        "IPV4 address": ipv4Ret,
+                        "IPV6 address": ipv6Ret,
+                        "CNAME": ipvcnameRet,
+                        "CAA": ipcaaret,
+                        "MX": ipmxret,
+                        "NAPTR": ipnptrret,
+                        "SOA": ipsoaret,
+                        "SRV": ipsrvret,
+                        "TXT": iptxtret
+                    }
                 });
                 return
             }
