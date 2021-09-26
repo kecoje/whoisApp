@@ -58,9 +58,116 @@ lookup = async (req, res) => {
 
     try {
         var dnsOut;
-        dns.resolveAny(adr, (err, ret) => {
-            dnsOut = ret
-        });
+        var ipv4Ret;
+        var ipv6Ret;
+        var ipvcnameRet;
+        var ipcaaret;
+        var ipmxret;
+        var ipnptrret;
+        var ipsoaret;
+        var ipsrvret;
+        var iptxtret;
+        var foundv4 = false;
+        var foundv6 = false;
+        var foundcname = false;
+        var foundcaa = false;
+        var foundmx = false;
+        var foundnptr = false;
+        var foundsoa = false;
+        var foundsrv = false;
+        var foundtxt = false;
+        for(var j = 0; j < 3; j++)
+        {
+            if(!foundv4){
+                dns.resolve4(adr, (err, ret) => {
+                    ipv4Ret = ret
+                    
+                    if(!(ipv4Ret === undefined))
+                    {
+                        foundv4 = true;
+                    }   
+                });
+            }
+            if(!foundv6){
+                dns.resolve6(adr, (err, ret) => {
+                    ipv6Ret = ret
+                    
+                    if(!(ipv6Ret === undefined))
+                    {
+                        foundv6 = true;
+                    }   
+                });
+            }
+            if(!foundcname){
+                dns.resolveCname(adr, (err, ret) => {
+                    ipvcnameRet = ret
+                    if(!(ipvcnameRet === undefined))
+                    {
+                        foundcname = true;
+                    }   
+                });
+            }
+            if(!foundcaa){
+                dns.resolveCaa(adr, (err, ret) => {
+                    ipcaaret = ret
+                    
+                    if(!(ipcaaret === undefined))
+                    {
+                        foundcaa = true;
+                    }   
+                });
+            }
+            if(!foundmx){
+                dns.resolveMx(adr, (err, ret) => {
+                    ipmxret = ret
+                    
+                    if(!(ipmxret === undefined))
+                    {
+                        foundmx = true;
+                    }
+                });
+            }
+            if(!foundnptr){
+                dns.resolveNaptr(adr, (err, ret) => {
+                    ipnptrret = ret
+                    
+                    if(!(ipnptrret === undefined))
+                    {
+                        foundnptr = true;
+                    }   
+                });
+            }
+            if(!foundsoa){
+                dns.resolveSoa(adr, (err, ret) => {
+                    ipsoaret = ret
+                    
+                    if(!(ipsoaret === undefined))
+                    {
+                        foundsoa = true;
+                    }
+                });
+            }
+            if(!foundsrv){
+                dns.resolveSrv(adr, (err, ret) => {
+                    ipsrvret = ret
+                    
+                    if(!(ipsrvret === undefined))
+                    {
+                        foundsrv = true;
+                    }   
+                });
+            }
+            if(!foundtxt){
+                dns.resolveTxt(adr, (err, ret) => {
+                    iptxtret = ret
+                    
+                    if(!(iptxtret === undefined))
+                    {
+                        foundtxt = true;
+                    }   
+                });
+            }
+        }
         whois.lookup(adr, function (err, data) {
 
             var match;
@@ -193,7 +300,17 @@ lookup = async (req, res) => {
                     "Registrar URL": registrarUrlRes,
                     "Registrant": registrantRes,
                 },
-                dnsOut
+                "dnsOut": {
+                    "IPV4 address": ipv4Ret,
+                    "IPV6 address": ipv6Ret,
+                    "CNAME": ipvcnameRet,
+                    "CAA": ipcaaret,
+                    "MX": ipmxret,
+                    "NAPTR": ipnptrret,
+                    "SOA": ipsoaret,
+                    "SRV": ipsrvret,
+                    "TXT": iptxtret
+                }
             });
         })
     }
