@@ -1,4 +1,5 @@
 const { Application } = require("express");
+const nodemailer = require("nodemailer");
 const whois = require('whois')
 const punycode = require('punycode');
 function isASCII(str) { return /^[\x00-\x7F]*$/.test(str); }
@@ -16,6 +17,19 @@ admin.initializeApp({
 //admin.initializeApp(functions.config().firebase);
 
 const fcm = admin.messaging();
+
+let testAccount = await nodemailer.createTestAccount();
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: testAccount.user, // generated ethereal user
+      pass: testAccount.pass, // generated ethereal password
+    },
+  });
 
 exports.routesConfig = app => {
     // looks up whois and dns
@@ -439,9 +453,19 @@ cron.schedule('*/100 * * * * *', () => {
                 // if yes then send the notification using all the tokens
                 while (tokenArray !== undefined && tokenArray.length > 0) {
                     tokencic = tokenArray.pop();
-
+                    notificationText = "Domain name " + domainName + " has expired";
+                    if(tokenMap[tokencic]!=null){
+                        let info = await transporter.sendMail({
+                            from: '"Ninzenjeri Whois" <foo@example.com>', // sender address
+                            to: tokenMap[tokencic], // list of receivers
+                            subject: "Expiry Notification", // Subject line
+                            text: notificationText, // plain text body
+                            html: "<b>Hello world?</b>", // html body
+                          });
+                        tokenMap[tokencic] = null;
+                    }
                     notification = {
-                        title: "Domain name " + domainName + " has expired",
+                        title: notificationText,
                         body: "Click here to check current status",
                         token: tokencic,
                     }
