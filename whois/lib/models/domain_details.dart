@@ -23,6 +23,7 @@ class DomainDetails {
   bool isNewlyUnlocked = false;
   bool isAlarm;
   DnsModel? dns;
+  bool isFaulty = false;
 
   toggleFavorite() {
     isFavorite = !isFavorite;

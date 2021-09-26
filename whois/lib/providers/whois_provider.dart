@@ -77,15 +77,23 @@ class WhoisProvider extends ChangeNotifier {
               name: text,
               isRegistered: false,
             );
+          } else if (decodedBody.containsKey("message") &&
+              decodedBody["message"] == "") {
+            //DOMEN IZAZIVA GRESKU
+            ddetails = DomainDetails(
+              name: text,
+              isRegistered: false,
+            );
+            ddetails.isFaulty = true;
           } else {
             //DOMEN JE REGISTROVAN
             ddetails = DomainDetails(
               name: text,
               owner: decodedBody["whoisOut"]["Registrant"],
-              dateRegistered: DateTime.tryParse(
-                  decodedBody["whoisOut"]["Registration Date"] ?? ""),
-              dateExpiring: DateTime.tryParse(
-                  decodedBody["whoisOut"]["Expiration Date"] ?? ""),
+              dateRegistered: DateTime.fromMillisecondsSinceEpoch(
+                  decodedBody["whoisOut"]["Registration Date"] ?? 0),
+              dateExpiring: DateTime.fromMillisecondsSinceEpoch(
+                  decodedBody["whoisOut"]["Expiration Date"] ?? 0),
               registrar: decodedBody["whoisOut"]["Registrar"],
               registrarUrl: decodedBody["whoisOut"]["Registrar URL"],
               isRegistered: true,
@@ -106,15 +114,19 @@ class WhoisProvider extends ChangeNotifier {
           if (oldIndex != null && oldDetails != null) {
             //DOMEN PONOVO UCITAN
             searchedDomains.removeAt(oldIndex);
-            searchedDomains.insert(oldIndex, ddetails);
-            ddetails.isAlarm = oldDetails.isAlarm;
-            ddetails.isFavorite = oldDetails.isFavorite;
-            if (!ddetails.isRegistered)
-              ddetails.isNewlyUnlocked = oldDetails.isNewlyUnlocked;
+            if (!ddetails.isFaulty) {
+              searchedDomains.insert(oldIndex, ddetails);
+              ddetails.isAlarm = oldDetails.isAlarm;
+              ddetails.isFavorite = oldDetails.isFavorite;
+              if (!ddetails.isRegistered)
+                ddetails.isNewlyUnlocked = oldDetails.isNewlyUnlocked;
+            }
           } else {
             //DOMEN PRVI PUT UCITAN
-            searchedDomains.insert(0, ddetails);
-            historyListKey.currentState?.insertItem(0);
+            if (!ddetails.isFaulty) {
+              searchedDomains.insert(0, ddetails);
+              historyListKey.currentState?.insertItem(0);
+            }
           }
           save();
           notifyListeners();

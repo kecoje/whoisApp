@@ -80,6 +80,7 @@ class LocalizationProvider extends ChangeNotifier {
   String get domenJeSlobodan => _l ? "Domen je slobodan" : "Домен је слободан";
 
   String get oslobodjen => _l ? "oslobođen" : "ослобођен";
+  String get greska => _l ? "Greška" : "Грешка";
 
   String get ukljuciNotifikaciju => _l ? "Uključi notifikaciju" : "Укључи нотификацију";
   String get obavestiMeIPutemMejla => _l ? "Obavesti me i putem email-a" : "Обавести ме и путем мејла";

@@ -44,7 +44,7 @@ class _ResultTabState extends State<ResultTab> {
                   ? launch("https://" + widget.data.name)
                   : null
               : null,
-          color: widget.data.isRegistered ? redish : greenish,
+          color: widget.data.isFaulty ? Colors.orange : widget.data.isRegistered ? redish : greenish,
         ),
         if (widget.data.isRegistered) ...[
           Container(
@@ -193,7 +193,13 @@ class _ResultTabState extends State<ResultTab> {
               ),
             ),
         ] else
-          Container(
+          widget.data.isFaulty ? Container(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            child: Text(
+              Provider.of<LocalizationProvider>(context).greska,
+              style: TextStyle(fontSize: 18),
+            ),
+          ) : Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             child: Text(
               Provider.of<LocalizationProvider>(context).domenJeSlobodan,

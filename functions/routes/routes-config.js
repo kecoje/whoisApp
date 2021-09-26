@@ -10,7 +10,7 @@ const functions = require('firebase-functions');
 var serviceAccount = require("../serviceAccountKey.json");
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.cert(serviceAccount)
 });
 
 //admin.initializeApp(functions.config().firebase);
@@ -43,45 +43,71 @@ function toUnixTime(datum) {
         return Date.parse(datum.toString().substring(0, 10))
     }
     if (datum.toString()[2] == '.') {
-            let day = datum.substring(0, 2)
-            let month = datum.substring(3, 5)
-            let year = datum.substring(6, 10)
-            return Date.parse(year + "-" + month + "-" + day)
+        let day = datum.substring(0, 2)
+        let month = datum.substring(3, 5)
+        let year = datum.substring(6, 10)
+        return Date.parse(year + "-" + month + "-" + day)
     }
-    if (datum.toString()[2] == '-'){
-        let day=datum.substring(0,2)
-        let month=datum.substring(3,6)
-        let year=datum.substring(7,11)
-        switch(month){
-            case 'Jan':{month=1
-                        break}
-            case 'Feb':{month=2
-                        break}
-            case 'Mar':{month=3
-                        break}
-            case 'Apr':{month=4
-                        break}
-            case 'May':{month=5
-                        break}
-            case 'Jun':{month=6
-                        break}
-            case 'Jul':{month=7
-                        break}
-            case 'Aug':{month=8
-                        break}
-            case 'Sep':{month=9
-                        break}
-            case 'Oct':{month=10
-                        break}
-            case 'Nov':{month=11
-                        break}
-            case 'Dec':{month=12
-                        break}
+    if (datum.toString()[2] == '-') {
+        let day = datum.substring(0, 2)
+        let month = datum.substring(3, 6)
+        let year = datum.substring(7, 11)
+        switch (month) {
+            case 'Jan': {
+                month = 1
+                break
+            }
+            case 'Feb': {
+                month = 2
+                break
+            }
+            case 'Mar': {
+                month = 3
+                break
+            }
+            case 'Apr': {
+                month = 4
+                break
+            }
+            case 'May': {
+                month = 5
+                break
+            }
+            case 'Jun': {
+                month = 6
+                break
+            }
+            case 'Jul': {
+                month = 7
+                break
+            }
+            case 'Aug': {
+                month = 8
+                break
+            }
+            case 'Sep': {
+                month = 9
+                break
+            }
+            case 'Oct': {
+                month = 10
+                break
+            }
+            case 'Nov': {
+                month = 11
+                break
+            }
+            case 'Dec': {
+                month = 12
+                break
+            }
         }
         return Date.parse(year + "-" + month + "-" + day)
     }
     return datum;
- }
+}
+
+
 lookup = async (req, res) => {
 
     const { address } = req.body;
@@ -100,11 +126,11 @@ lookup = async (req, res) => {
     domLst = ""
     if ((adr.match(/./g) || []).length > 0) {
         niz = adr.split(".");
-        domLst = niz[niz.length-1]
+        domLst = niz[niz.length - 1]
     }
     console.log(domLst)
-    
-    
+
+
     try {
         var dnsOut;
         var ipv4Ret;
@@ -125,109 +151,104 @@ lookup = async (req, res) => {
         var foundsoa = false;
         var foundsrv = false;
         var foundtxt = false;
-        for(var j = 0; j < 3; j++)
-        {
-            if(!foundv4){
-                dns.resolve4(adr, (err, ret) => {
-                    ipv4Ret = ret
-                    
-                    if(!(ipv4Ret === undefined))
-                    {
-                        foundv4 = true;
-                    }   
-                });
+        try {
+            for (var j = 0; j < 3; j++) {
+                if (!foundv4) {
+                    dns.resolve4(adr, (err, ret) => {
+                        ipv4Ret = ret
+
+                        if (!(ipv4Ret === undefined)) {
+                            foundv4 = true;
+                        }
+                    });
+                }
+                if (!foundv6) {
+                    dns.resolve6(adr, (err, ret) => {
+                        ipv6Ret = ret
+
+                        if (!(ipv6Ret === undefined)) {
+                            foundv6 = true;
+                        }
+                    });
+                }
+                if (!foundcname) {
+                    dns.resolveCname(adr, (err, ret) => {
+                        ipvcnameRet = ret
+                        if (!(ipvcnameRet === undefined)) {
+                            foundcname = true;
+                        }
+                    });
+                }
+
+                if (!foundmx) {
+                    dns.resolveMx(adr, (err, ret) => {
+                        ipmxret = ret
+
+                        if (!(ipmxret === undefined)) {
+                            foundmx = true;
+                        }
+                    });
+                }
+                if (!foundnptr) {
+                    dns.resolveNaptr(adr, (err, ret) => {
+                        ipnptrret = ret
+
+                        if (!(ipnptrret === undefined)) {
+                            foundnptr = true;
+                        }
+                    });
+                }
+                if (!foundsoa) {
+                    dns.resolveSoa(adr, (err, ret) => {
+                        ipsoaret = ret
+
+                        if (!(ipsoaret === undefined)) {
+                            foundsoa = true;
+                        }
+                    });
+                }
+                if (!foundsrv) {
+                    dns.resolveSrv(adr, (err, ret) => {
+                        ipsrvret = ret
+
+                        if (!(ipsrvret === undefined)) {
+                            foundsrv = true;
+                        }
+                    });
+                }
+                if (!foundtxt) {
+                    dns.resolveTxt(adr, (err, ret) => {
+                        iptxtret = ret
+
+                        if (!(iptxtret === undefined)) {
+                            foundtxt = true;
+                        }
+                    });
+                }
+                if (!foundcaa) {
+                    dns.resolveCaa(adr, (err, ret) => {
+                        ipcaaret = ret
+
+                        if (!(ipcaaret === undefined)) {
+                            foundcaa = true;
+                        }
+                    });
+                }
             }
-            if(!foundv6){
-                dns.resolve6(adr, (err, ret) => {
-                    ipv6Ret = ret
-                    
-                    if(!(ipv6Ret === undefined))
-                    {
-                        foundv6 = true;
-                    }   
-                });
-            }
-            if(!foundcname){
-                dns.resolveCname(adr, (err, ret) => {
-                    ipvcnameRet = ret
-                    if(!(ipvcnameRet === undefined))
-                    {
-                        foundcname = true;
-                    }   
-                });
-            }
-            if(!foundcaa){
-                dns.resolveCaa(adr, (err, ret) => {
-                    ipcaaret = ret
-                    
-                    if(!(ipcaaret === undefined))
-                    {
-                        foundcaa = true;
-                    }   
-                });
-            }
-            if(!foundmx){
-                dns.resolveMx(adr, (err, ret) => {
-                    ipmxret = ret
-                    
-                    if(!(ipmxret === undefined))
-                    {
-                        foundmx = true;
-                    }
-                });
-            }
-            if(!foundnptr){
-                dns.resolveNaptr(adr, (err, ret) => {
-                    ipnptrret = ret
-                    
-                    if(!(ipnptrret === undefined))
-                    {
-                        foundnptr = true;
-                    }   
-                });
-            }
-            if(!foundsoa){
-                dns.resolveSoa(adr, (err, ret) => {
-                    ipsoaret = ret
-                    
-                    if(!(ipsoaret === undefined))
-                    {
-                        foundsoa = true;
-                    }
-                });
-            }
-            if(!foundsrv){
-                dns.resolveSrv(adr, (err, ret) => {
-                    ipsrvret = ret
-                    
-                    if(!(ipsrvret === undefined))
-                    {
-                        foundsrv = true;
-                    }   
-                });
-            }
-            if(!foundtxt){
-                dns.resolveTxt(adr, (err, ret) => {
-                    iptxtret = ret
-                    
-                    if(!(iptxtret === undefined))
-                    {
-                        foundtxt = true;
-                    }   
-                });
-            }
+        } catch (e) {
+
         }
         whois.lookup(adr, function (err, data) {
             var match;
-            if (domLst.valueOf() == "uk"){
-                data = data.replace(/ {2,}/gm," ")
+            if (domLst.valueOf() == "uk") {
+                data = data.replace(/ {2,}/gm, " ")
                 data = data.replace(/:(\r\n|\n|\r)/gm, ": ");
                 console.log(data)
                 regx = /[dD]omain [Nn]ame:[ ]*(.*)/g
                 dnResReg = (regx.exec(data))
-                if (dnResReg != null){
+                if (dnResReg != null) {
                     dnRes = dnResReg[1]
-                } else{
+                } else {
                     res.send({
                         "message": "Domen ne postoji"
                     });
@@ -235,37 +256,37 @@ lookup = async (req, res) => {
                 }
                 regx = /[rR]egistered [Oo]n:[ ]*(.*)/gm
                 dnResReg = (regx.exec(data))
-                if (dnResReg != null){
+                if (dnResReg != null) {
                     rdRes = dnResReg[1]
-                } else{
+                } else {
                     rdRes = null
                 }
                 regx = /[eE]xpiry date:[ ]*(.*)/gm
                 dnResReg = (regx.exec(data))
-                if (dnResReg != null){
+                if (dnResReg != null) {
                     edRes = dnResReg[1]
-                } else{
+                } else {
                     edRes = null
                 }
                 regx = /[Rr]egistrar:[ ]*(.*)/gm
                 dnResReg = (regx.exec(data))
-                if (dnResReg != null){
+                if (dnResReg != null) {
                     registrarRes = dnResReg[1]
-                } else{
+                } else {
                     registrarRes = null
                 }
                 regx = /[Rr]egistrant:[ ]*(.*)/gm
                 dnResReg = (regx.exec(data))
-                if (dnResReg != null){
+                if (dnResReg != null) {
                     registrantRes = dnResReg[1]
-                } else{
+                } else {
                     registrantRes = null
                 }
                 regx = /URL:[ ]*(.*)/gm
                 dnResReg = (regx.exec(data))
-                if (dnResReg != null){
+                if (dnResReg != null) {
                     registrarUrlRes = dnResReg[1]
-                } else{
+                } else {
                     registrarUrlRes = null
                 }
                 res.send({
@@ -409,40 +430,40 @@ lookup = async (req, res) => {
                     }
                 }
             }
-            if (dnRes != null){
-                dnRes = dnRes.replace(/ {2,}/g," ")
-                if (dnRes[0] == ' '){
-                    dnRes = dnRes.substring(1,dnRes.length)
+            if (dnRes != null) {
+                dnRes = dnRes.replace(/ {2,}/g, " ")
+                if (dnRes[0] == ' ') {
+                    dnRes = dnRes.substring(1, dnRes.length)
                 }
             }
-            if (rdRes != null){
-                rdRes = rdRes.replace(/ {2,}/g," ")
-                if (rdRes[0] == ' '){
-                    rdRes = rdRes.substring(1,rdRes.length)
+            if (rdRes != null) {
+                rdRes = rdRes.replace(/ {2,}/g, " ")
+                if (rdRes[0] == ' ') {
+                    rdRes = rdRes.substring(1, rdRes.length)
                 }
             }
-            if (edRes != null){
-                edRes = edRes.replace(/ {2,}/g," ")
-                if (edRes[0] == ' '){
-                    edRes = edRes.substring(1,edRes.length)
+            if (edRes != null) {
+                edRes = edRes.replace(/ {2,}/g, " ")
+                if (edRes[0] == ' ') {
+                    edRes = edRes.substring(1, edRes.length)
                 }
             }
-            if (registrarRes != null){
-                registrarRes = registrarRes.replace(/ {2,}/g," ")
-                if (registrarRes[0] == ' '){
-                    registrarRes = registrarRes.substring(1,registrarRes.length)
+            if (registrarRes != null) {
+                registrarRes = registrarRes.replace(/ {2,}/g, " ")
+                if (registrarRes[0] == ' ') {
+                    registrarRes = registrarRes.substring(1, registrarRes.length)
                 }
             }
-            if (registrarUrlRes != null){
-                registrarUrlRes = registrarUrlRes.replace(/ {2,}/g," ")
-                if (registrarUrlRes[0] == ' '){
-                    registrarUrlRes = registrarUrlRes.substring(1,registrarUrlRes.length)
+            if (registrarUrlRes != null) {
+                registrarUrlRes = registrarUrlRes.replace(/ {2,}/g, " ")
+                if (registrarUrlRes[0] == ' ') {
+                    registrarUrlRes = registrarUrlRes.substring(1, registrarUrlRes.length)
                 }
             }
-            if (registrantRes != null){
-                registrantRes = registrantRes.replace(/ {2,}/g," ")
-                if (registrantRes[0] == ' '){
-                    registrantRes = registrantRes.substring(1,registrantRes.length)
+            if (registrantRes != null) {
+                registrantRes = registrantRes.replace(/ {2,}/g, " ")
+                if (registrantRes[0] == ' ') {
+                    registrantRes = registrantRes.substring(1, registrantRes.length)
                 }
             }
             dnRes = punycode.toUnicode(dnRes)
@@ -497,7 +518,9 @@ setNotify = (req, res) => {
             text: "Token: " + token + " has been sent to the server"
         });
     } catch (e) {
-        console.log(e.message);
+        res.status(400).send({
+            message: "Error!"
+        })
     }
 };
 
@@ -523,7 +546,9 @@ removeNotify = (req, res) => {
             text: "Token: " + token + " has been removed from the server"
         });
     } catch (e) {
-        console.log(e.message);
+        res.status(400).send({
+            message: "Error!"
+        })
     }
 };
 
