@@ -150,6 +150,19 @@ lookup = async (req, res) => {
     }
     //console.log(domLst)
 
+    try {
+        if (!(domLst in baza) && baza[domLst] == null) {
+            res.status(400).send({
+                message: "Error!"
+            })
+            return;
+        }
+    } catch (e) {
+        res.status(400).send({
+            message: "Error!"
+        })
+        return;
+    }
 
     try {
         var dnsOut;
@@ -578,7 +591,8 @@ removeNotify = (req, res) => {
 
 getExp = async (address, callback) => {
 
-    adr = address
+    console.log(address)
+    let adr = punycode.toASCII(address)
     if ((adr.match(/\:\/\//g) || []).length > 0) {
         niz = adr.split("://")
         adr = niz[1]
@@ -587,33 +601,100 @@ getExp = async (address, callback) => {
         niz = adr.split("/")
         adr = niz[0]
     }
-    if ((adr.match(/./g) || []).length > 1) {
+    domLst = ""
+    if ((adr.match(/./g) || []).length > 0) {
         niz = adr.split(".");
-        adr = niz[niz.length - 2] + "." + niz[niz.length - 1]
+        domLst = niz[niz.length - 1]
+    }
+    //console.log(domLst)
+
+    try {
+        if (!(domLst in baza) && baza[domLst] == null) {
+            return null;
+        }
+    } catch (e) {
+        return null;
     }
     try {
 
-        whois.lookup(adr, function (err, data) {
+        whois.lookup(adr, {
+            "server": baza[domLst]
+        }, function (err, data) {
+
+            if (domLst.valueOf() == "uk") {
+                data = data.replace(/ {2,}/gm, " ")
+                data = data.replace(/:(\r\n|\n|\r)/gm, ": ");
+                regx = /[dD]omain [Nn]ame:[ ]*(.*)/g
+                dnResReg = (regx.exec(data))
+                if (dnResReg != null) {
+                    dnRes = dnResReg[1]
+                } else {
+                    res.send({
+                        "message": "Domen ne postoji"
+                    });
+                    return;
+                }
+                regx = /[eE]xpiry date:[ ]*(.*)/gm
+                dnResReg = (regx.exec(data))
+                if (dnResReg != null) {
+                    edRes = dnResReg[1]
+                } else {
+                    edRes = null
+                }
+                callback(toUnixTime(edRes))
+            }
 
             var match;
 
-            var regx = /Domain [nN]ame: ([^(\\\r\\\n)]*)/g
+            var regx = /[dD]omain [nN]ame: ([^(\\\r\\\n)]*)/g
             var dnResReg = (regx.exec(data))
             var dnRes = null
             if (dnResReg != null) {
                 dnRes = dnResReg[1]
             } else {
-                return null;
+                regx = /[dD]omain: ([^(\\r\\\n)]*)/g
+                dnResReg = (regx.exec(data))
+                if (dnResReg != null) {
+                    dnRes = dnResReg[1]
+                }
+                else {
+                    res.send({
+                        "message": "Domen ne postoji"
+                    });
+                    return;
+                }
             }
 
-            regx = /Expiration [dD]ate: ([^(\\\r\\\n)]*)/g
+            regx = /[eE]xpiration [dD]ate: ([^(\\\r\\\n)]*)/g
             var edResReg = (regx.exec(data))
             var edRes = null
             if (edResReg != null) {
                 edRes = edResReg[1]
             }
+            else {
+                regx = /[pP]aid-till: ([^(\\\r\\\n)]*)/g
+                var edResReg = (regx.exec(data))
+                var edRes = null
+                if (edResReg != null) {
+                    edRes = edResReg[1]
+                }
+                else {
+                    regx = /[eE]xpire[s]?: ([^(\\\r\\\n)]*)/g
+                    var edResReg = (regx.exec(data))
+                    var edRes = null
+                    if (edResReg != null) {
+                        edRes = edResReg[1]
+                    }
+                }
+            }
+            if (edRes != null) {
+                edRes = edRes.replace(/ {2,}/g, " ")
+                if (edRes[0] == ' ') {
+                    edRes = edRes.substring(1, edRes.length)
+                }
+            }
 
-            callback(edRes)
+            callback(toUnixTime(edRes))
         })
 
     }
@@ -629,20 +710,20 @@ cron.schedule('*/100 * * * * *', () => {
         // current time in miliseconds
         milisec = new Date().getTime();
         // call function with param waiting[i].name (eg. example.com)
-        //exp = await getExp(waiting[i].name);
-        //expmilisec = Date.parse(exp);
-        var expmilisec;
+
         getExp(domainName, (expmilisec) => {
+            if (expmilisec == null) { delete waiting[domainName]; return; }
+
             // ask if current time is equal to the expiration time
             //Nameran bag (true)
-            console.log(toUnixTime(expmilisec));
-            if (milisec > toUnixTime(expmilisec) || true) {
+            console.log(expmilisec);
+            if (milisec > expmilisec || true) {
                 // if yes then send the notification using all the tokens
                 while (tokenArray !== undefined && tokenArray.length > 0) {
                     tokencic = tokenArray.pop();
                     notificationText = "Domain name " + domainName + " has expired";
 
-                    if (tokenMap[tokencic] !== null && tokenMap[tokencic] !== undefined) {
+                    if (tokencic in tokenMap && tokenMap[tokencic] !== null && tokenMap[tokencic] !== undefined) {
                         transporter.sendMail({
                             from: '"Ninzenjeri Whois" <ninzenjeri@gmail.com>', // sender address
                             to: tokenMap[tokencic], // list of receivers

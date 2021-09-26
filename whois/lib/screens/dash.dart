@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
@@ -42,8 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
             duration: Duration(milliseconds: 1200),
             curve: Curves.fastLinearToSlowEaseIn);
       } else {
-        _mainController.animateTo(0,
-            duration: Duration(milliseconds: 1000), curve: Curves.easeOutCubic);
+        // _mainController.animateTo(0,
+        //     duration: Duration(milliseconds: 1000), curve: Curves.easeOutCubic);
       }
     });
     _searchController.addListener(_updateUI);
@@ -121,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           children: [
                             Expanded(
                                 child: TextField(
-                                  onSubmitted: (_) => _runSearch(whois),
+                              onSubmitted: (_) => _runSearch(whois),
                               controller: _searchController,
                               focusNode: _searchNode,
                               style: const TextStyle(fontSize: 18),
@@ -294,6 +295,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _runSearch(WhoisProvider whois) async {
     if (_waiting) return;
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
     String input = _searchController.text.toLowerCase();
     //Podesiti regExp za srbiju
     if (!RegExp(

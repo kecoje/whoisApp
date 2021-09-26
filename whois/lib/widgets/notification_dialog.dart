@@ -21,8 +21,9 @@ class _NotificationDialogState extends State<NotificationDialog> {
 
   @override
   void initState() {
-    _mailController.text = Provider.of<WhoisProvider>(context, listen: false).mail ?? "";
-    if(_mailController.text != "") _useMail = true;
+    _mailController.text =
+        Provider.of<WhoisProvider>(context, listen: false).mail ?? "";
+    if (_mailController.text != "") _useMail = true;
     super.initState();
   }
 
@@ -60,11 +61,11 @@ class _NotificationDialogState extends State<NotificationDialog> {
             if (_useMail)
               TextField(
                 controller: _mailController,
+                onSubmitted: (_) => _okPressed(),
                 decoration: InputDecoration(
                   hintText:
                       Provider.of<LocalizationProvider>(context).unesiteEmail,
                   hintStyle: const TextStyle(fontSize: 18, color: lighterGrey),
-                 
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Colors.black, width: 1.0),
                   ),
@@ -76,14 +77,7 @@ class _NotificationDialogState extends State<NotificationDialog> {
       ),
       actions: [
         TextButton(
-            onPressed: () {
-              if(_useMail && _mailController.text.length < 3) return;
-              widget.onAccept(_mailController.text);
-              if(!_useMail) _mailController.text = "";
-              Provider.of<WhoisProvider>(context,  listen: false).mail = _mailController.text;
-              Provider.of<WhoisProvider>(context,  listen: false).save();
-              Navigator.of(context).pop();
-            },
+            onPressed: _okPressed,
             child: Text(Provider.of<LocalizationProvider>(context).ok,
                 style: TextStyle(fontSize: 18, color: Colors.black))),
         TextButton(
@@ -92,5 +86,15 @@ class _NotificationDialogState extends State<NotificationDialog> {
                 style: TextStyle(fontSize: 18, color: Colors.black))),
       ],
     );
+  }
+
+  _okPressed() {
+    if (_useMail && _mailController.text.length < 3) return;
+    widget.onAccept(_mailController.text);
+    if (!_useMail) _mailController.text = "";
+    Provider.of<WhoisProvider>(context, listen: false).mail =
+        _mailController.text;
+    Provider.of<WhoisProvider>(context, listen: false).save();
+    Navigator.of(context).pop();
   }
 }

@@ -78,7 +78,7 @@ class WhoisProvider extends ChangeNotifier {
               isRegistered: false,
             );
           } else if (decodedBody.containsKey("message") &&
-              decodedBody["message"] == "") {
+              decodedBody["message"] == "Error!") {
             //DOMEN IZAZIVA GRESKU
             ddetails = DomainDetails(
               name: text,
@@ -159,7 +159,7 @@ class WhoisProvider extends ChangeNotifier {
         body: json.encode({
           'name': name,
           'token': token,
-          if (mail != null) 'email': mail,
+          if (mail != null && mail != "") 'email': mail,
         }),
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
