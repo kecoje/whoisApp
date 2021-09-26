@@ -31,9 +31,54 @@ exports.routesConfig = app => {
         removeNotify
     );
 }
-
+function replaceAll(str, find, replace) {
+    return str.replace(new RegExp(find, 'g'), replace);
+}
 var waiting = {};
-
+function toUnixTime(datum) {
+    if (datum.toString()[4] == '-') {
+        return Date.parse(datum.toString().substring(0, 10))
+    }
+    if (datum.toString()[2] == '.') {
+            let day = datum.substring(0, 2)
+            let month = datum.substring(3, 5)
+            let year = datum.substring(6, 10)
+            return Date.parse(year + "-" + month + "-" + day)
+    }
+    if (datum.toString()[2] == '-'){
+        let day=datum.substring(0,2)
+        let month=datum.substring(3,6)
+        let year=datum.substring(7,11)
+        switch(month){
+            case 'Jan':{month=1
+                        break}
+            case 'Feb':{month=2
+                        break}
+            case 'Mar':{month=3
+                        break}
+            case 'Apr':{month=4
+                        break}
+            case 'May':{month=5
+                        break}
+            case 'Jun':{month=6
+                        break}
+            case 'Jul':{month=7
+                        break}
+            case 'Aug':{month=8
+                        break}
+            case 'Sep':{month=9
+                        break}
+            case 'Oct':{month=10
+                        break}
+            case 'Nov':{month=11
+                        break}
+            case 'Dec':{month=12
+                        break}
+        }
+        return Date.parse(year + "-" + month + "-" + day)
+    }
+    return datum;
+ }
 lookup = async (req, res) => {
 
     const { address } = req.body;
@@ -49,13 +94,14 @@ lookup = async (req, res) => {
         niz = adr.split("/")
         adr = niz[0]
     }
-    if ((adr.match(/./g) || []).length > 1) {
+    domLst = ""
+    if ((adr.match(/./g) || []).length > 0) {
         niz = adr.split(".");
-        adr = niz[niz.length - 2] + "." + niz[niz.length - 1]
+        domLst = niz[niz.length-1]
     }
-
-    //console.log(adr)
-
+    console.log(domLst)
+    
+    
     try {
         var dnsOut;
         var ipv4Ret;
@@ -169,9 +215,69 @@ lookup = async (req, res) => {
             }
         }
         whois.lookup(adr, function (err, data) {
-
             var match;
-            //console.log(data)
+            if (domLst.valueOf() == "uk"){
+                data = data.replace(/ {2,}/gm," ")
+                data = data.replace(/:(\r\n|\n|\r)/gm, ": ");
+                console.log(data)
+                regx = /[dD]omain [Nn]ame:[ ]*(.*)/g
+                dnResReg = (regx.exec(data))
+                if (dnResReg != null){
+                    dnRes = dnResReg[1]
+                } else{
+                    res.send({
+                        "message": "Domen ne postoji"
+                    });
+                    return;
+                }
+                regx = /[rR]egistered [Oo]n:[ ]*(.*)/gm
+                dnResReg = (regx.exec(data))
+                if (dnResReg != null){
+                    rdRes = dnResReg[1]
+                } else{
+                    rdRes = null
+                }
+                regx = /[eE]xpiry date:[ ]*(.*)/gm
+                dnResReg = (regx.exec(data))
+                if (dnResReg != null){
+                    edRes = dnResReg[1]
+                } else{
+                    edRes = null
+                }
+                regx = /[Rr]egistrar:[ ]*(.*)/gm
+                dnResReg = (regx.exec(data))
+                if (dnResReg != null){
+                    registrarRes = dnResReg[1]
+                } else{
+                    registrarRes = null
+                }
+                regx = /[Rr]egistrant:[ ]*(.*)/gm
+                dnResReg = (regx.exec(data))
+                if (dnResReg != null){
+                    registrantRes = dnResReg[1]
+                } else{
+                    registrantRes = null
+                }
+                regx = /URL:[ ]*(.*)/gm
+                dnResReg = (regx.exec(data))
+                if (dnResReg != null){
+                    registrarUrlRes = dnResReg[1]
+                } else{
+                    registrarUrlRes = null
+                }
+                res.send({
+                    "whoisOut": {
+                        "Domain Name": dnRes,
+                        "Registration Date": toUnixTime(rdRes),
+                        "Expiration Date": toUnixTime(edRes),
+                        "Registrar": registrarRes,
+                        "Registrar URL": registrarUrlRes,
+                        "Registrant": registrantRes,
+                    },
+                    dnsOut
+                });
+                return
+            }
             var regx = /[dD]omain [nN]ame: ([^(\\\r\\\n)]*)/g
             var dnResReg = (regx.exec(data))
             var dnRes = null
@@ -290,12 +396,48 @@ lookup = async (req, res) => {
                     }
                 }
             }
-
+            if (dnRes != null){
+                dnRes = dnRes.replace(/ {2,}/g," ")
+                if (dnRes[0] == ' '){
+                    dnRes = dnRes.substring(1,dnRes.length)
+                }
+            }
+            if (rdRes != null){
+                rdRes = rdRes.replace(/ {2,}/g," ")
+                if (rdRes[0] == ' '){
+                    rdRes = rdRes.substring(1,rdRes.length)
+                }
+            }
+            if (edRes != null){
+                edRes = edRes.replace(/ {2,}/g," ")
+                if (edRes[0] == ' '){
+                    edRes = edRes.substring(1,edRes.length)
+                }
+            }
+            if (registrarRes != null){
+                registrarRes = registrarRes.replace(/ {2,}/g," ")
+                if (registrarRes[0] == ' '){
+                    registrarRes = registrarRes.substring(1,registrarRes.length)
+                }
+            }
+            if (registrarUrlRes != null){
+                registrarUrlRes = registrarUrlRes.replace(/ {2,}/g," ")
+                if (registrarUrlRes[0] == ' '){
+                    registrarUrlRes = registrarUrlRes.substring(1,registrarUrlRes.length)
+                }
+            }
+            if (registrantRes != null){
+                registrantRes = registrantRes.replace(/ {2,}/g," ")
+                if (registrantRes[0] == ' '){
+                    registrantRes = registrantRes.substring(1,registrantRes.length)
+                }
+            }
+            dnRes = punycode.toUnicode(dnRes)
             res.send({
                 "whoisOut": {
                     "Domain Name": dnRes,
-                    "Registration Date": rdRes,
-                    "Expiration Date": edRes,
+                    "Registration Date": toUnixTime(rdRes),
+                    "Expiration Date": toUnixTime(edRes),
                     "Registrar": registrarRes,
                     "Registrar URL": registrarUrlRes,
                     "Registrant": registrantRes,
