@@ -18,18 +18,20 @@ admin.initializeApp({
 
 const fcm = admin.messaging();
 
-let testAccount = await nodemailer.createTestAccount();
-
-  // create reusable transporter object using the default SMTP transport
-  let transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // true for 465, false for other ports
+var transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    type: "SMTP",
     auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
+        user: 'ninzenjeri@gmail.com',
+        pass: 'smiled3go'
     },
-  });
+    tls: {
+        rejectUnauthorized: false
+    },
+    secure:true,
+    debug:true
+});
 
 exports.routesConfig = app => {
     // looks up whois and dns
@@ -456,7 +458,7 @@ cron.schedule('*/100 * * * * *', () => {
                     notificationText = "Domain name " + domainName + " has expired";
                     if(tokenMap[tokencic]!=null){
                         let info = await transporter.sendMail({
-                            from: '"Ninzenjeri Whois" <foo@example.com>', // sender address
+                            from: '"Ninzenjeri Whois" <ninzenjeri@gmail.com>', // sender address
                             to: tokenMap[tokencic], // list of receivers
                             subject: "Expiry Notification", // Subject line
                             text: notificationText, // plain text body
