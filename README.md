@@ -1,7 +1,7 @@
 # whoisApp
-Projekat za hakaton Septembar 2021
+Project for 2021 Whois Hackaton
 
-Radili:
+Contributors:
 Luka Savić
 Dušan Todorović
 Janko Tufegdžić
