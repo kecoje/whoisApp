@@ -2,10 +2,14 @@
 Project for 2021 Whois Hackaton
 
 Contributors:
-Luka Savić
-Dušan Todorović
-Janko Tufegdžić
-Miloš Kecojević
+<ul>
+<li><a href="https://github.com/DusanTodorovic5" target="_blank">Dušan Todorović<a/></li>
+<li><a href="https://github.com/lukasavic1" target="_blank">Luka Savić<a/></li>
+<li><a href="https://github.com/DrMrJanko" target="_blank">Janko Tufegdžić<a/></li>
+<li><a href="https://github.com/kecoje" target="_blank">Miloš Kecojević<a/></li>
+</ul>
+
+
 
 ## Screenshots
 <p float="left"> 
